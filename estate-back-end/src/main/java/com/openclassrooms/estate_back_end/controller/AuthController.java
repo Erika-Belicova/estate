@@ -1,19 +1,18 @@
 package com.openclassrooms.estate_back_end.controller;
 
-import org.springframework.http.HttpStatus;
+import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.AuthenticationException;
 import org.springframework.web.bind.annotation.*;
 
-import com.openclassrooms.estate_back_end.model.LoginRequest;
-import com.openclassrooms.estate_back_end.model.RegisterRequest;
+import com.openclassrooms.estate_back_end.dto.LoginRequest;
+import com.openclassrooms.estate_back_end.dto.RegisterRequest;
 import com.openclassrooms.estate_back_end.model.User;
 import com.openclassrooms.estate_back_end.service.JWTService;
 import com.openclassrooms.estate_back_end.service.UserService;
-import java.util.Optional;
+import com.openclassrooms.estate_back_end.dto.AuthResponse;
 
 @RestController
 @RequestMapping("/api/auth")
@@ -30,22 +29,22 @@ public class AuthController {
     }
 
     @PostMapping("/register")
-    public ResponseEntity<String> register(@RequestBody RegisterRequest request) {
+    public ResponseEntity<AuthResponse> register(@RequestBody @Valid RegisterRequest request) {
         User user = userService.registerUser(request.getEmail(), request.getName(), request.getPassword());
-        return ResponseEntity.status(HttpStatus.CREATED).body("New user registered with email: " + user.getEmail());
+        Authentication authentication = authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword())
+        );
+        String token = jwtService.generateToken(authentication);
+        return ResponseEntity.ok(new AuthResponse(token)); // 200 ok
     }
 
     @PostMapping("/login")
-    public ResponseEntity<String> login(@RequestBody LoginRequest loginRequest) {
-        try {
-            Authentication authentication = authenticationManager.authenticate(
-                    new UsernamePasswordAuthenticationToken(loginRequest.getEmail(), loginRequest.getPassword())
-            );
-            String token = jwtService.generateToken(authentication);
-            return ResponseEntity.ok(token);
-        } catch (AuthenticationException e) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Credentials are invalid");
-        }
+    public ResponseEntity<Object> login(@RequestBody @Valid LoginRequest loginRequest) {
+        Authentication authentication = authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(loginRequest.getEmail(), loginRequest.getPassword())
+        );
+        String token = jwtService.generateToken(authentication);
+        return ResponseEntity.ok(new AuthResponse(token)); // 200 ok
     }
 
 }
