@@ -37,7 +37,12 @@ public class JWTService {
 				JwsHeader.with(MacAlgorithm.HS256).build(),
 				claims
 		);
-		return this.jwtEncoder.encode(jwtEncoderParameters).getTokenValue();
+
+		try {
+			return this.jwtEncoder.encode(jwtEncoderParameters).getTokenValue();
+		} catch (Exception e) {
+			throw new RuntimeException("Token generation failed. Please try again later.");
+		}
 	}
 
 }

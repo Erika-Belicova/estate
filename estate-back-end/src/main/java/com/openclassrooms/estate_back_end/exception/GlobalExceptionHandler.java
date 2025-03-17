@@ -17,7 +17,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<Void> handleValidationException(MethodArgumentNotValidException exception) {
-        return ResponseEntity.badRequest().build();
+        return ResponseEntity.badRequest().build(); // 400 bad request
     }
 
     @ExceptionHandler(AuthenticationException.class)
@@ -26,6 +26,11 @@ public class GlobalExceptionHandler {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                     .body(Collections.singletonMap("message", "error")); // error message for failed login
         }
-        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build(); // 401 unauthorized
+    }
+
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<Void> handleGeneralException(Exception exception) {
+        return ResponseEntity.badRequest().build(); // 400 bad request for unhandled exceptions
     }
 }
