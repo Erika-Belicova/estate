@@ -38,7 +38,10 @@ public class SpringSecurityConfig {
 			.csrf(csrf -> csrf.disable())
 			.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 			.authorizeHttpRequests(auth -> auth
-					.requestMatchers("/api/auth/login", "/api/auth/register").permitAll() // login and register accessible without authentication
+					.requestMatchers(
+							"/api/auth/login", "/api/auth/register", // public
+							"/swagger-ui/**", "/v3/api-docs/**", "/swagger-ui.html", "/swagger-resources/**", "/webjars/**" // swagger
+					).permitAll() // login and register accessible without authentication
 					.anyRequest().authenticated()) // all other routes need authentication
 			.oauth2ResourceServer((oauth2) -> oauth2.jwt(Customizer.withDefaults()))
 			.build();
@@ -47,7 +50,7 @@ public class SpringSecurityConfig {
 	@Bean
 	public JwtDecoder jwtDecoder() {
 	    SecretKeySpec secretKey = new SecretKeySpec(this.jwtProperties.getSecretKey().getBytes(), 0,
-				this.jwtProperties.getSecretKey().getBytes().length,"RSA");
+				this.jwtProperties.getSecretKey().getBytes().length,"HS256");
 	    return NimbusJwtDecoder.withSecretKey(secretKey).macAlgorithm(MacAlgorithm.HS256).build();
 	}
 
