@@ -1,16 +1,19 @@
 package com.openclassrooms.estate_back_end.dto;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.validation.constraints.NotNull;
 
 public class MessageDTO {
 
     @NotNull
-    private Integer userId;
-
-    @NotNull
     private String message;
 
     @NotNull
+    @JsonProperty("user_id")
+    private Integer userId;
+
+    @NotNull
+    @JsonProperty("rental_id")
     private Integer rentalId;
 
     public Integer getUserId() {

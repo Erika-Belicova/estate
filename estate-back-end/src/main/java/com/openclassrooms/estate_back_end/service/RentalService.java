@@ -42,4 +42,14 @@ public class RentalService {
         return rentalMapper.toRentalDTO(rental);
     }
 
+    public Rental getRentalEntityById(Integer id) {
+        return rentalRepository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Rental not found"));
+    }
+
+    public void updateRental(Rental rental) {
+        rental.setUpdatedAt(LocalDateTime.now());
+        rentalRepository.save(rental);
+    }
+
 }

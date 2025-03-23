@@ -1,11 +1,11 @@
 package com.openclassrooms.estate_back_end.mapper;
 
 import com.openclassrooms.estate_back_end.dto.MessageDTO;
-import com.openclassrooms.estate_back_end.dto.RentalDTO;
 import com.openclassrooms.estate_back_end.model.Message;
 import com.openclassrooms.estate_back_end.model.Rental;
 import com.openclassrooms.estate_back_end.model.User;
 import org.modelmapper.ModelMapper;
+import org.modelmapper.PropertyMap;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -16,6 +16,13 @@ public class MessageMapper {
     @Autowired
     public MessageMapper(ModelMapper modelMapper) {
         this.modelMapper = modelMapper;
+        // mapping to avoid ModelMapper misinterpreting IDs
+        this.modelMapper.addMappings(new PropertyMap<MessageDTO, Message>() {
+            @Override
+            protected void configure() {
+                skip(destination.getMessageId());  // ignore auto-generated messageId
+            }
+        });
     }
 
     @Autowired
@@ -28,11 +35,12 @@ public class MessageMapper {
         return messageDTO;
     }
 
-    public Message toMessageEntity(MessageDTO messageDTO, User user, RentalDTO rentalDTO) {
+    public Message toMessageEntity(MessageDTO messageDTO, User user, Rental rental) {
         Message message = modelMapper.map(messageDTO, Message.class);
-        Rental rental = rentalMapper.toRentalEntity(rentalDTO, user);
         message.setUser(user);
         message.setRental(rental);
+        message.setCreatedAt(java.time.LocalDateTime.now());
+        message.setUpdatedAt(java.time.LocalDateTime.now());
         return message;
     }
 
