@@ -9,11 +9,12 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/api/auth")
+@RequestMapping("/api")
 public class UserController {
 
     private final UserService userService;
@@ -26,10 +27,17 @@ public class UserController {
         this.userMapper = userMapper;
     }
 
-    @GetMapping("/me")
+    @GetMapping("/auth/me")
     public ResponseEntity<UserDTO> getCurrentUser(Authentication authentication) {
         String username = authentication.getName();
         User user = userRepository.findByEmail(username).orElseThrow(() -> new UsernameNotFoundException("User not found"));
+        UserDTO userDTO = userMapper.toUserDTO(user);
+        return ResponseEntity.ok(userDTO);
+    }
+
+    @GetMapping("/user/{id}")
+    public ResponseEntity<UserDTO> getUserById(@PathVariable Integer id) {
+        User user = userService.getUserById(id);
         UserDTO userDTO = userMapper.toUserDTO(user);
         return ResponseEntity.ok(userDTO);
     }

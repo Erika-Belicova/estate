@@ -1,8 +1,10 @@
 package com.openclassrooms.estate_back_end.dto;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.List;
 
 public class RentalDTO {
@@ -18,8 +20,14 @@ public class RentalDTO {
 
     @JsonProperty("owner_id")
     private Integer ownerId;
-    private String createdAt;
-    private String updatedAt;
+
+    @JsonProperty("created_at")
+    @JsonFormat(pattern = "yyyy/MM/dd")
+    private LocalDateTime createdAt;
+
+    @JsonProperty("updated_at")
+    @JsonFormat(pattern = "yyyy/MM/dd")
+    private LocalDateTime updatedAt;
 
     public Integer getId() {
         return id;
@@ -77,19 +85,19 @@ public class RentalDTO {
         this.ownerId = ownerId;
     }
 
-    public String getCreatedAt() {
+    public LocalDateTime getCreatedAt() {
         return createdAt;
     }
 
-    public void setCreatedAt(String createdAt) {
+    public void setCreatedAt(LocalDateTime createdAt) {
         this.createdAt = createdAt;
     }
 
-    public String getUpdatedAt() {
+    public LocalDateTime getUpdatedAt() {
         return updatedAt;
     }
 
-    public void setUpdatedAt(String updatedAt) {
+    public void setUpdatedAt(LocalDateTime updatedAt) {
         this.updatedAt = updatedAt;
     }
 

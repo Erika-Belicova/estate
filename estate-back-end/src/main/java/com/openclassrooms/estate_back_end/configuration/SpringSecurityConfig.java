@@ -40,7 +40,8 @@ public class SpringSecurityConfig {
 			.authorizeHttpRequests(auth -> auth
 					.requestMatchers(
 							"/api/auth/login", "/api/auth/register", // public
-							"/swagger-ui/**", "/v3/api-docs/**", "/swagger-ui.html", "/swagger-resources/**", "/webjars/**" // swagger
+							"/swagger-ui/**", "/v3/api-docs/**", "/swagger-ui.html", "/swagger-resources/**", "/webjars/**", // swagger
+							"/pictures/**" // picture access
 					).permitAll() // login and register accessible without authentication
 					.anyRequest().authenticated()) // all other routes need authentication
 			.oauth2ResourceServer((oauth2) -> oauth2.jwt(Customizer.withDefaults()))

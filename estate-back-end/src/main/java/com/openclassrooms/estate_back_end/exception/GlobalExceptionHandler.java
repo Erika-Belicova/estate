@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.security.core.AuthenticationException;
+import org.springframework.web.multipart.MaxUploadSizeExceededException;
 
 import java.util.Collections;
 
@@ -33,4 +34,17 @@ public class GlobalExceptionHandler {
     public ResponseEntity<Void> handleGeneralException(Exception exception) {
         return ResponseEntity.badRequest().build(); // 400 bad request for unhandled exceptions
     }
+
+    @ExceptionHandler(RentalCreationException.class)
+    public ResponseEntity<Object> handleRentalCreationException(RentalCreationException ex) {
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(Collections.singletonMap("error", ex.getMessage()));
+    }
+
+    @ExceptionHandler(MaxUploadSizeExceededException.class)
+    public ResponseEntity<String> handleMaxUploadSizeExceededException(MaxUploadSizeExceededException e) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body("File size exceeds the maximum allowed size.");
+    }
+
 }

@@ -5,6 +5,8 @@ import com.openclassrooms.estate_back_end.repository.MessageRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
+
 @Service
 public class MessageService {
 
@@ -16,6 +18,8 @@ public class MessageService {
     }
 
     public void saveMessage(Message message) {
+        message.setCreatedAt(LocalDateTime.now());
+        message.setUpdatedAt(LocalDateTime.now());
         messageRepository.save(message);
     }
 

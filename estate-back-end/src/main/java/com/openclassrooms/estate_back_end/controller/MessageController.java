@@ -1,9 +1,9 @@
 package com.openclassrooms.estate_back_end.controller;
 
 import com.openclassrooms.estate_back_end.dto.MessageDTO;
-import com.openclassrooms.estate_back_end.dto.RentalDTO;
 import com.openclassrooms.estate_back_end.mapper.MessageMapper;
 import com.openclassrooms.estate_back_end.model.Message;
+import com.openclassrooms.estate_back_end.model.Rental;
 import com.openclassrooms.estate_back_end.model.User;
 import com.openclassrooms.estate_back_end.service.MessageService;
 import com.openclassrooms.estate_back_end.service.RentalService;
@@ -29,7 +29,8 @@ public class MessageController {
     private final MessageMapper messageMapper;
 
     @Autowired
-    public MessageController(MessageService messageService, UserService userService, RentalService rentalService, MessageMapper messageMapper) {
+    public MessageController(MessageService messageService, UserService userService,
+                             RentalService rentalService, MessageMapper messageMapper) {
         this.messageService = messageService;
         this.userService = userService;
         this.rentalService = rentalService;
@@ -38,20 +39,24 @@ public class MessageController {
 
     @PostMapping("/messages")
     public ResponseEntity<Object> sendMessage(@Valid @RequestBody MessageDTO messageDTO) {
+
         User user = userService.getUserById(messageDTO.getUserId());
         if (user == null) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("User not found");
         }
 
-        RentalDTO rental = rentalService.getRentalById(messageDTO.getRentalId());
+        Rental rental = rentalService.getRentalEntityById(messageDTO.getRentalId());
         if (rental == null) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Rental not found");
         }
 
+        messageDTO.setUserId(user.getUserId());
+        messageDTO.setRentalId(rental.getRentalId());
         Message message = messageMapper.toMessageEntity(messageDTO, user, rental);
+
         messageService.saveMessage(message);
 
-        Map<String, String> response = Collections.singletonMap("message", "Message sent with success"); // response message
+        Map<String, String> response = Collections.singletonMap("message", "Message sent with success");
         return ResponseEntity.ok().body(response);
     }
 }
