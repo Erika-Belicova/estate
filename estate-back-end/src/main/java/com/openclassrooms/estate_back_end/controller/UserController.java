@@ -5,6 +5,10 @@ import com.openclassrooms.estate_back_end.mapper.UserMapper;
 import com.openclassrooms.estate_back_end.model.User;
 import com.openclassrooms.estate_back_end.repository.UserRepository;
 import com.openclassrooms.estate_back_end.service.UserService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -27,6 +31,12 @@ public class UserController {
         this.userMapper = userMapper;
     }
 
+    @Tag(name = "User APIs", description = "APIs for retrieving user data")
+    @Operation(summary = "Get current authenticated user", description = "Retrieve the currently authenticated user details based on the provided authentication token.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Successfully fetched the current user's data"),
+            @ApiResponse(responseCode = "401", description = "Unauthorized, user not authenticated")
+    })
     @GetMapping("/auth/me")
     public ResponseEntity<UserDTO> getCurrentUser(Authentication authentication) {
         String username = authentication.getName();
@@ -35,6 +45,12 @@ public class UserController {
         return ResponseEntity.ok(userDTO);
     }
 
+    @Tag(name = "User APIs", description = "APIs for retrieving user data by ID")
+    @Operation(summary = "Get user by ID", description = "Retrieve the details of a user by their unique user ID.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Successfully fetched the user data"),
+            @ApiResponse(responseCode = "401", description = "Unauthorized, user not authenticated")
+    })
     @GetMapping("/user/{id}")
     public ResponseEntity<UserDTO> getUserById(@PathVariable Integer id) {
         User user = userService.getUserById(id);
