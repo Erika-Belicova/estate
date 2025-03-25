@@ -8,9 +8,13 @@ import com.openclassrooms.estate_back_end.model.User;
 import com.openclassrooms.estate_back_end.service.MessageService;
 import com.openclassrooms.estate_back_end.service.RentalService;
 import com.openclassrooms.estate_back_end.service.UserService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import io.swagger.v3.oas.annotations.tags.Tag;
 
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,6 +41,13 @@ public class MessageController {
         this.messageMapper = messageMapper;
     }
 
+    @Tag(name = "Message APIs", description = "APIs for sending messages")
+    @Operation(summary = "Send a message", description = "Send a message from a user to a rental. The message will be associated with the user and rental.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Message sent successfully"),
+            @ApiResponse(responseCode = "401", description = "Unauthorized, invalid user or token"),
+            @ApiResponse(responseCode = "404", description = "User or rental not found")
+    })
     @PostMapping("/messages")
     public ResponseEntity<Object> sendMessage(@Valid @RequestBody MessageDTO messageDTO) {
 
