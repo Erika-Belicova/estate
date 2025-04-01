@@ -1,19 +1,28 @@
 package com.openclassrooms.estate_back_end.controller;
 
 import com.openclassrooms.estate_back_end.dto.RentalDTO;
+import com.openclassrooms.estate_back_end.exception.EntityNotFoundException;
 import com.openclassrooms.estate_back_end.exception.RentalCreationException;
+import com.openclassrooms.estate_back_end.exception.RentalUpdateException;
+import com.openclassrooms.estate_back_end.exception.UnauthorizedAccessException;
 import com.openclassrooms.estate_back_end.mapper.RentalMapper;
 import com.openclassrooms.estate_back_end.model.Rental;
 import com.openclassrooms.estate_back_end.model.User;
+import com.openclassrooms.estate_back_end.response.MessageResponse;
+import com.openclassrooms.estate_back_end.response.RentalsResponse;
 import com.openclassrooms.estate_back_end.service.PictureService;
 import com.openclassrooms.estate_back_end.service.RentalService;
 import com.openclassrooms.estate_back_end.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.constraints.DecimalMin;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -26,6 +35,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
+@SecurityRequirement(name = "Authorization")
 @RestController
 @RequestMapping("/api")
 public class RentalController {
@@ -52,9 +62,10 @@ public class RentalController {
             @ApiResponse(responseCode = "401", description = "Unauthorized, user not authenticated")
     })
     @GetMapping("/rentals")
-    public ResponseEntity<Map<String, List<RentalDTO>>> getAllRentals() {
+    public ResponseEntity<RentalsResponse> getAllRentals() {
         List<RentalDTO> rentals = rentalService.getAllRentals();
-        return ResponseEntity.ok(Collections.singletonMap("rentals", rentals));
+        RentalsResponse response = new RentalsResponse(rentals);
+        return ResponseEntity.ok(response);
     }
 
     @Tag(name = "Rental APIs", description = "APIs for creating new rentals")
@@ -63,24 +74,40 @@ public class RentalController {
             @ApiResponse(responseCode = "200", description = "Rental created successfully"),
             @ApiResponse(responseCode = "401", description = "Unauthorized, user not authenticated")
     })
-    @PostMapping("/rentals")
+    @PostMapping(value = "/rentals", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<Object> createRental(
+            @Parameter(description = "Name of the rental", required = true, example = "Apartment")
             @RequestParam("name") String name,
-            @RequestParam("surface") BigDecimal surface,
-            @RequestParam("price") BigDecimal price,
+
+            @Parameter(description = "Surface area of the rental in square meters", required = true, example = "50")
+            @RequestParam("surface")
+            @DecimalMin(value = "0", inclusive = true, message = "Surface can not be a negative value")
+            BigDecimal surface,
+
+            @Parameter(description = "Price of the rental per night", required = true, example = "200")
+            @RequestParam("price")
+            @DecimalMin(value = "0", inclusive = true, message = "Price can not be a negative value")
+            BigDecimal price,
+
+            @Parameter(description = "Picture of the rental (picture file)", required = true)
             @RequestParam("picture") MultipartFile picture,
+
+            @Parameter(description = "Description of the rental", required = true, example = "A nice apartment")
             @RequestParam("description") String description) throws IOException {
 
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String currentUsername = authentication.getName();
         User owner = userService.getUserByEmail(currentUsername);
-        Integer ownerId = owner.getUserId();
+
+        if (owner == null) {
+            throw new EntityNotFoundException("User not found");
+        }
 
         String picturePath = pictureService.uploadPicture(picture); // upload picture
         String pictureUrl = pictureService.getPicture(picturePath); // get url for picture to save in the database
 
         RentalDTO rentalDTO = new RentalDTO();
-        rentalDTO.setOwnerId(ownerId);
+        rentalDTO.setOwnerId(owner.getUserId());
         rentalDTO.setName(name);
         rentalDTO.setSurface(surface);
         rentalDTO.setPrice(price);
@@ -95,7 +122,7 @@ public class RentalController {
         } catch (Exception e) {
             throw new RentalCreationException("Error creating rental", e);
         }
-        return ResponseEntity.ok(Collections.singletonMap("message", "Rental created !"));
+        return ResponseEntity.ok(new MessageResponse("Rental created !"));
     }
 
     @Tag(name = "Rental APIs", description = "APIs for updating existing rentals")
@@ -106,19 +133,37 @@ public class RentalController {
     })
     @PutMapping("/rentals/{id}")
     public ResponseEntity<Object> updateRental(
+            @Parameter(description = "Unique ID of the rental to update", required = true, example = "2")
             @PathVariable Integer id,
+
+            @Parameter(description = "Updated name of the rental", example = "House")
             @RequestParam(value = "name", required = false) String name,
-            @RequestParam(value = "surface", required = false) BigDecimal surface,
-            @RequestParam(value = "price", required = false) BigDecimal price,
+
+            @Parameter(description = "Updated surface area of the rental in square meters", example = "90")
+            @RequestParam(value = "surface", required = false)
+            @DecimalMin(value = "0", inclusive = true, message = "Surface can not be a negative value")
+            BigDecimal surface,
+
+            @Parameter(description = "Updated price of the rental per night", example = "400")
+            @RequestParam(value = "price", required = false)
+            @DecimalMin(value = "0", inclusive = true, message = "Price can not be a negative value")
+            BigDecimal price,
+
+            @Parameter(description = "Updated description", example = "A nice house")
             @RequestParam(value = "description", required = false) String description) throws IOException {
 
         Rental rental = rentalService.getRentalEntityById(id);
+
+        if (rental == null) {
+            throw new EntityNotFoundException("Rental not found");
+        }
+
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String currentUsername = authentication.getName();
 
         // check if user is the owner of the rental
         if (!rental.getOwner().getEmail().equals(currentUsername)) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("You are not authorized to update this rental");
+            throw new UnauthorizedAccessException("You are not authorized to update this rental");
         }
         // update only provided values
         if (name != null) rental.setName(name);
@@ -126,8 +171,12 @@ public class RentalController {
         if (price != null) rental.setPrice(price);
         if (description != null) rental.setDescription(description);
 
-        rentalService.updateRental(rental);
-        return ResponseEntity.ok(Collections.singletonMap("message", "Rental updated !"));
+        try {
+            rentalService.updateRental(rental);
+        } catch (Exception ex) {
+            throw new RentalUpdateException("Error updating rental", ex);
+        }
+        return ResponseEntity.ok(new MessageResponse("Rental updated !"));
     }
 
     @Tag(name = "Rental APIs", description = "APIs for retrieving rental details by ID")
@@ -137,8 +186,14 @@ public class RentalController {
             @ApiResponse(responseCode = "401", description = "Unauthorized, user not authenticated")
     })
     @GetMapping("/rentals/{id}")
-    public ResponseEntity<RentalDTO> getRentalById(@PathVariable Integer id) {
+    public ResponseEntity<RentalDTO> getRentalById(
+            @Parameter(description = "Unique ID of the rental to retrieve", required = true, example = "1")
+            @PathVariable Integer id) {
         RentalDTO rentalDTO = rentalService.getRentalById(id);
+
+        if (rentalDTO == null) {
+            throw new EntityNotFoundException("Rental not found with ID: " + id);
+        }
         return ResponseEntity.ok(rentalDTO);
     }
 }
