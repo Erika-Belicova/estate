@@ -1,4 +1,4 @@
-package com.openclassrooms.estate_back_end.dto;
+package com.openclassrooms.estate_back_end.response;
 
 public class AuthResponse {
 

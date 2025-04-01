@@ -1,17 +1,20 @@
 package com.openclassrooms.estate_back_end.controller;
 
 import com.openclassrooms.estate_back_end.dto.MessageDTO;
+import com.openclassrooms.estate_back_end.exception.EntityNotFoundException;
 import com.openclassrooms.estate_back_end.mapper.MessageMapper;
 import com.openclassrooms.estate_back_end.model.Message;
 import com.openclassrooms.estate_back_end.model.Rental;
 import com.openclassrooms.estate_back_end.model.User;
+import com.openclassrooms.estate_back_end.response.MessageResponse;
 import com.openclassrooms.estate_back_end.service.MessageService;
 import com.openclassrooms.estate_back_end.service.RentalService;
 import com.openclassrooms.estate_back_end.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
-import org.springframework.http.HttpStatus;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -20,9 +23,7 @@ import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestBody;
 
-import java.util.Collections;
-import java.util.Map;
-
+@SecurityRequirement(name = "Authorization")
 @RestController
 @RequestMapping("/api")
 public class MessageController {
@@ -46,19 +47,21 @@ public class MessageController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Message sent successfully"),
             @ApiResponse(responseCode = "401", description = "Unauthorized, invalid user or token"),
-            @ApiResponse(responseCode = "404", description = "User or rental not found")
+            @ApiResponse(responseCode = "400", description = "User or rental not found")
     })
     @PostMapping("/messages")
-    public ResponseEntity<Object> sendMessage(@Valid @RequestBody MessageDTO messageDTO) {
+    public ResponseEntity<Object> sendMessage(
+            @Parameter(description = "Message data containing the user ID, rental ID, and the content of the message", required = true)
+            @Valid @RequestBody MessageDTO messageDTO) {
 
         User user = userService.getUserById(messageDTO.getUserId());
         if (user == null) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("User not found");
+            throw new EntityNotFoundException("User not found");
         }
 
         Rental rental = rentalService.getRentalEntityById(messageDTO.getRentalId());
         if (rental == null) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Rental not found");
+            throw new EntityNotFoundException("Rental not found");
         }
 
         messageDTO.setUserId(user.getUserId());
@@ -67,7 +70,7 @@ public class MessageController {
 
         messageService.saveMessage(message);
 
-        Map<String, String> response = Collections.singletonMap("message", "Message sent with success");
+        MessageResponse response = new MessageResponse("Message sent with success");
         return ResponseEntity.ok().body(response);
     }
 }

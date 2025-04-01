@@ -1,6 +1,7 @@
 package com.openclassrooms.estate_back_end.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.validation.Valid;
@@ -16,7 +17,7 @@ import com.openclassrooms.estate_back_end.dto.RegisterRequest;
 import com.openclassrooms.estate_back_end.model.User;
 import com.openclassrooms.estate_back_end.service.JWTService;
 import com.openclassrooms.estate_back_end.service.UserService;
-import com.openclassrooms.estate_back_end.dto.AuthResponse;
+import com.openclassrooms.estate_back_end.response.AuthResponse;
 
 @RestController
 @RequestMapping("/api/auth")
@@ -39,7 +40,10 @@ public class AuthController {
             @ApiResponse(responseCode = "400", description = "Bad Request, invalid input")
     })
     @PostMapping("/register")
-    public ResponseEntity<AuthResponse> register(@RequestBody @Valid RegisterRequest request) {
+    public ResponseEntity<AuthResponse> register(
+            @Parameter(description = "User registration data including name, email, and password", required = true,
+                    example = "{\"Name\": \"Jean Dupont\", \"Email\": \"email@email.com\", \"Password\": \"password\"}")
+            @RequestBody @Valid RegisterRequest request) {
         User user = userService.registerUser(request.getEmail(), request.getName(), request.getPassword());
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword())
@@ -55,7 +59,10 @@ public class AuthController {
             @ApiResponse(responseCode = "401", description = "Unauthorized, invalid credentials")
     })
     @PostMapping("/login")
-    public ResponseEntity<Object> login(@RequestBody @Valid LoginRequest loginRequest) {
+    public ResponseEntity<Object> login(
+            @Parameter(description = "Login credentials including email and password", required = true,
+                    example = "{\"Email\": \"email@email.com\", \"Password\": \"password\"}")
+            @RequestBody @Valid LoginRequest loginRequest) {
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(loginRequest.getEmail(), loginRequest.getPassword())
         );
