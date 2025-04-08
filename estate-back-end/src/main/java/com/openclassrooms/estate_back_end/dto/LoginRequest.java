@@ -14,7 +14,8 @@ public class LoginRequest {
     @NotEmpty
     private String password;
 
-    public LoginRequest() {}
+    public LoginRequest() {
+    }
 
     public LoginRequest(String email, String password) {
         this.email = email;
@@ -36,4 +37,5 @@ public class LoginRequest {
     public void setPassword(String password) {
         this.password = password;
     }
+
 }

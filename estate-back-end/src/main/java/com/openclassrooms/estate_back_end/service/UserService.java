@@ -1,7 +1,5 @@
 package com.openclassrooms.estate_back_end.service;
 
-import com.openclassrooms.estate_back_end.dto.RentalDTO;
-import com.openclassrooms.estate_back_end.model.Rental;
 import com.openclassrooms.estate_back_end.model.User;
 import com.openclassrooms.estate_back_end.repository.UserRepository;
 import jakarta.transaction.Transactional;
@@ -16,6 +14,7 @@ import org.springframework.web.server.ResponseStatusException;
 public class UserService {
 
     private final UserRepository userRepository;
+
     private final BCryptPasswordEncoder passwordEncoder;
 
     @Autowired
@@ -34,13 +33,12 @@ public class UserService {
     }
 
     public User getUserByEmail(String email) {
-        return userRepository.findByEmail(email)
-                .orElseThrow(() -> new UsernameNotFoundException("User not found"));
+        return userRepository.findByEmail(email).orElseThrow(() -> new UsernameNotFoundException("User not found"));
     }
 
     public User getUserById(Integer id) {
         return userRepository.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
+            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
     }
 
 }

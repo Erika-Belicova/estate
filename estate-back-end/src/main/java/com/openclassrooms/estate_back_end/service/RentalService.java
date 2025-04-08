@@ -17,6 +17,7 @@ public class RentalService {
 
     @Autowired
     private final RentalRepository rentalRepository;
+
     private final RentalMapper rentalMapper;
 
     @Autowired
@@ -38,13 +39,13 @@ public class RentalService {
 
     public RentalDTO getRentalById(Integer id) {
         Rental rental = rentalRepository.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Rental not found"));
+            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Rental not found"));
         return rentalMapper.toRentalDTO(rental);
     }
 
     public Rental getRentalEntityById(Integer id) {
         return rentalRepository.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Rental not found"));
+            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Rental not found"));
     }
 
     public void updateRental(Rental rental) {

@@ -5,6 +5,7 @@ import com.openclassrooms.estate_back_end.dto.RentalDTO;
 import java.util.List;
 
 public class RentalsResponse {
+
     private List<RentalDTO> rentals;
 
     public RentalsResponse(List<RentalDTO> rentals) {
@@ -18,4 +19,5 @@ public class RentalsResponse {
     public void setRentals(List<RentalDTO> rentals) {
         this.rentals = rentals;
     }
+
 }

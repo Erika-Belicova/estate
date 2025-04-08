@@ -1,88 +1,81 @@
 package com.openclassrooms.estate_back_end.model;
 
-import java.time.LocalDateTime;
+import jakarta.persistence.*;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.Table;
+import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "MESSAGES")
 public class Message {
-	
-	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	@Column(name = "id")
-	private Integer messageId;
-	
-	@ManyToOne
-	@JoinColumn(name = "rental_id", referencedColumnName = "id", nullable = false)
-	private Rental rental;
-	
-	@ManyToOne
-	@JoinColumn(name = "user_id", referencedColumnName = "id", nullable = false)
-	private User user;
 
-	@Column(name = "message")
-	private String message;
-	
-	@Column(name = "created_at", updatable = false)
-	private LocalDateTime createdAt;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id")
+    private Integer messageId;
 
-	@Column(name = "updated_at")
-	private LocalDateTime updatedAt;
+    @ManyToOne
+    @JoinColumn(name = "rental_id", referencedColumnName = "id", nullable = false)
+    private Rental rental;
 
-	public Integer getMessageId() {
-		return messageId;
-	}
+    @ManyToOne
+    @JoinColumn(name = "user_id", referencedColumnName = "id", nullable = false)
+    private User user;
 
-	public void setMessageId(Integer messageId) {
-		this.messageId = messageId;
-	}
+    @Column(name = "message")
+    private String message;
 
-	public Rental getRental() {
-		return rental;
-	}
+    @Column(name = "created_at", updatable = false)
+    private LocalDateTime createdAt;
 
-	public void setRental(Rental rental) {
-		this.rental = rental;
-	}
+    @Column(name = "updated_at")
+    private LocalDateTime updatedAt;
 
-	public User getUser() {
-		return user;
-	}
+    public Integer getMessageId() {
+        return messageId;
+    }
 
-	public void setUser(User user) {
-		this.user = user;
-	}
+    public void setMessageId(Integer messageId) {
+        this.messageId = messageId;
+    }
 
-	public String getMessage() {
-		return message;
-	}
+    public Rental getRental() {
+        return rental;
+    }
 
-	public void setMessage(String message) {
-		this.message = message;
-	}
+    public void setRental(Rental rental) {
+        this.rental = rental;
+    }
 
-	public LocalDateTime getCreatedAt() {
-		return createdAt;
-	}
+    public User getUser() {
+        return user;
+    }
 
-	public void setCreatedAt(LocalDateTime createdAt) {
-		this.createdAt = createdAt;
-	}
+    public void setUser(User user) {
+        this.user = user;
+    }
 
-	public LocalDateTime getUpdatedAt() {
-		return updatedAt;
-	}
+    public String getMessage() {
+        return message;
+    }
 
-	public void setUpdatedAt(LocalDateTime updatedAt) {
-		this.updatedAt = updatedAt;
-	}
-	
+    public void setMessage(String message) {
+        this.message = message;
+    }
+
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(LocalDateTime createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    public LocalDateTime getUpdatedAt() {
+        return updatedAt;
+    }
+
+    public void setUpdatedAt(LocalDateTime updatedAt) {
+        this.updatedAt = updatedAt;
+    }
+
 }

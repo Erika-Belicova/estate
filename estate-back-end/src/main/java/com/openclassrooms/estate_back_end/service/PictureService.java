@@ -24,7 +24,6 @@ public class PictureService {
     }
 
     public String uploadPicture(MultipartFile file) throws IOException {
-
         String contentType = file.getContentType();
         if (contentType == null || (!contentType.equals("image/jpeg"))) {
             throw new IllegalArgumentException("Only JPEG images are allowed");
@@ -40,7 +39,8 @@ public class PictureService {
 
         try {
             Files.copy(file.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
-        } catch (IOException e) {
+        }
+        catch (IOException e) {
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "File upload failed", e);
         }
 

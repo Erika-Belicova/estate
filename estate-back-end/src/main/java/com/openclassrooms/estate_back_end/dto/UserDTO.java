@@ -1,8 +1,9 @@
 package com.openclassrooms.estate_back_end.dto;
 
-import java.time.LocalDateTime;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
+import java.time.LocalDateTime;
 
 public class UserDTO {
 
