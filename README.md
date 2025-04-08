@@ -83,7 +83,7 @@ Or, if you're using a local MySQL installation on Windows, make sure the MySQL s
 ### Create the Database  
 In MySQL, create a new database for your application. You can run the following command to create the database:  
   
-`CREATE DATABASE estate;` 
+`CREATE DATABASE estate_application_db;` 
   
 ### Create and Configure the .env File  
 In order to connect the Spring Boot back-end with your MySQL database, you will need to create a .env file to store your MySQL credentials.
@@ -93,8 +93,8 @@ In order to connect the Spring Boot back-end with your MySQL database, you will 
       
 In the **.env** file, add the following variables:  
   
-` DATABASE_USERNAME=your_mysql_username
-DATABASE_PASSWORD=your_mysql_password` 
+`DATABASE_USERNAME=your_mysql_username`
+`DATABASE_PASSWORD=your_mysql_password` 
 
 -   Replace **your_mysql_username** with your MySQL username (usually **root** if using default settings).
 -   Replace **your_mysql_password** with your MySQL password.  
@@ -107,22 +107,21 @@ In your **estate-back-end/src/main/resources/application.properties**, make sure
 The configuration should look like this:  
   
 `spring.datasource.url=jdbc:mysql://localhost:3306/estate?serverTimeZone=UTC
-spring.datasource.username=${DATABASE_USERNAME}
-spring.datasource.password=${DATABASE_PASSWORD}
-spring.datasource.driver-class-name=com.mysql.cj.jdbc.Driver`
+ spring.datasource.username=${DATABASE_USERNAME}
+ spring.datasource.password=${DATABASE_PASSWORD}
+ spring.datasource.driver-class-name=com.mysql.cj.jdbc.Driver`
 
 -   Make sure the name estate matches the database you created earlier.
 -   The **\${DATABASE_USERNAME}** and **\${DATABASE_PASSWORD}** values will be loaded from the **.env** file.  
       
 ### Initialize the Database with SQL Script 
-Once the database is set up, run the SQL script to initialize the required tables. You can do this by navigating to the **estate-back-end/ressources/sql/** directory and running the following command:  
-  
+Once the database is set up, run the SQL script to initialize the required tables. The SQL script is located in the **estate-back-end/src/main/resources/sql/** directory. You can run the following command from the **root directory** of your project:
 
-`mysql -u ${DATABASE_USERNAME} -p estate < path/to/script.sql`
+`mysql -u ${DATABASE_USERNAME} -p estate_application_db < src/main/resources/sql/script.sql`
 
 This will create the necessary tables for the back-end to function correctly.  
   
-----------
+_____
 
 ### Important Notes:
 -   **MySQL Running:** MySQL must be running for the back-end to connect to the database. Otherwise the database will fail to connect.  
@@ -130,6 +129,25 @@ This will create the necessary tables for the back-end to function correctly.
 -   **Database Configuration:** The back-end will look for the database configuration in the .env file, so make sure that your MySQL credentials and database name are correctly set there.  
       
 -   **.env File:** The **.env** file should be placed in the root directory of the **estate-back-end** folder, alongside the **pom.xml** file. Make sure the values in this file are correct before running the application.  
+
+_____
+
+### Empty the Database for Testing
+If you want to empty the database during testing (for example, when you want to reset the data), you can delete all records from the tables by running the following SQL commands in your MySQL terminal:
+
+`DELETE FROM USERS;`
+`DELETE FROM RENTALS;`
+`DELETE FROM MESSAGES;`
+
+This will remove all data from the tables while keeping the table structure intact, which is useful for resetting data during tests. The related records in other tables will also be deleted automatically.
+
+### Reinitialize the Database
+If you want to completely reinitialize the database (drop all tables and recreate them), you can run the following SQL commands in your MySQL terminal:
+
+`DROP DATABASE IF EXISTS estate_application_db;`
+`CREATE DATABASE estate_application_db;`
+
+Then re-run the SQL script to reinitialize the tables.
 
 ## Back-End Setup
 
