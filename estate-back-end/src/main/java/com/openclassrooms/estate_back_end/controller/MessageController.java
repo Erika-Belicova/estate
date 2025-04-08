@@ -15,13 +15,14 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
 import io.swagger.v3.oas.annotations.tags.Tag;
-
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 @SecurityRequirement(name = "Authorization")
 @RestController
@@ -29,13 +30,16 @@ import org.springframework.web.bind.annotation.RequestBody;
 public class MessageController {
 
     private final MessageService messageService;
+
     private final UserService userService;
+
     private final RentalService rentalService;
+
     private final MessageMapper messageMapper;
 
     @Autowired
-    public MessageController(MessageService messageService, UserService userService,
-                             RentalService rentalService, MessageMapper messageMapper) {
+    public MessageController(MessageService messageService, UserService userService, RentalService rentalService,
+            MessageMapper messageMapper) {
         this.messageService = messageService;
         this.userService = userService;
         this.rentalService = rentalService;
@@ -43,16 +47,16 @@ public class MessageController {
     }
 
     @Tag(name = "Message APIs", description = "APIs for sending messages")
-    @Operation(summary = "Send a message", description = "Send a message from a user to a rental. The message will be associated with the user and rental.")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Message sent successfully"),
+    @Operation(summary = "Send a message",
+            description = "Send a message from a user to a rental. "
+                    + "The message will be associated with the user and rental.")
+    @ApiResponses(value = { @ApiResponse(responseCode = "200", description = "Message sent successfully"),
             @ApiResponse(responseCode = "401", description = "Unauthorized, invalid user or token"),
-            @ApiResponse(responseCode = "400", description = "User or rental not found")
-    })
+            @ApiResponse(responseCode = "400", description = "User or rental not found") })
     @PostMapping("/messages")
-    public ResponseEntity<Object> sendMessage(
-            @Parameter(description = "Message data containing the user ID, rental ID, and the content of the message", required = true)
-            @Valid @RequestBody MessageDTO messageDTO) {
+    public ResponseEntity<Object> sendMessage(@Parameter(
+            description = "Message data containing the user ID, rental ID, " + "and the content of the message",
+            required = true) @Valid @RequestBody MessageDTO messageDTO) {
 
         User user = userService.getUserById(messageDTO.getUserId());
         if (user == null) {
@@ -69,8 +73,9 @@ public class MessageController {
         Message message = messageMapper.toMessageEntity(messageDTO, user, rental);
 
         messageService.saveMessage(message);
-
         MessageResponse response = new MessageResponse("Message sent with success");
+
         return ResponseEntity.ok().body(response);
     }
+
 }

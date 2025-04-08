@@ -11,16 +11,18 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class MessageMapper {
+
     private final ModelMapper modelMapper;
 
     @Autowired
     public MessageMapper(ModelMapper modelMapper) {
         this.modelMapper = modelMapper;
-        // mapping to avoid ModelMapper misinterpreting IDs
+        // mapping to avoid ModelMapper misinterpreting IDs of messages
         this.modelMapper.addMappings(new PropertyMap<MessageDTO, Message>() {
             @Override
             protected void configure() {
-                skip(destination.getMessageId());  // ignore auto-generated messageId
+                // ignore auto-generated messageId
+                skip(destination.getMessageId());
             }
         });
     }

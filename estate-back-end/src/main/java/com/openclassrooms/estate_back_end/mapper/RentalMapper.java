@@ -24,10 +24,10 @@ public class RentalMapper {
             @Override
             protected void configure() {
                 using(ctx ->
-                        // if the picture is a string, wrap it in singleton list
-                        ctx.getSource() instanceof String ? Collections.singletonList((String) ctx.getSource()) :
-                                // if the picture already is a list, return it
-                                ctx.getSource() instanceof List ? ctx.getSource() : Collections.emptyList() // if the picture is empty, return an empty list
+                // if the picture is a string, wrap it in singleton list
+                ctx.getSource() instanceof String ? Collections.singletonList((String) ctx.getSource()) :
+                        // if the picture is a list, return it - else return an empty list
+                        ctx.getSource() instanceof List ? ctx.getSource() : Collections.emptyList()
                 ).map(source.getPicture(), destination.getPicture());
             }
         });
@@ -39,18 +39,20 @@ public class RentalMapper {
 
     public Rental toRentalEntity(RentalDTO rentalDTO, User owner) {
         Rental rental = modelMapper.map(rentalDTO, Rental.class);
+        // if the picture list is not empty, set the first element as the rental's picture
         if (rentalDTO.getPicture() != null && !rentalDTO.getPicture().isEmpty()) {
-            rental.setPicture(rentalDTO.getPicture().get(0)); // first element is the picture
-        } else {
-            rental.setPicture(null); // picture is empty
+            rental.setPicture(rentalDTO.getPicture().get(0));
+        }
+        else {
+            rental.setPicture(null);
         }
         rental.setOwner(owner);
         return rental;
     }
 
+    // converts a list of rental entities to a list of RentalDTOs
     public List<RentalDTO> toRentalDTOList(List<Rental> rentals) {
-        return rentals.stream()
-                .map(this::toRentalDTO)
-                .collect(Collectors.toList());
+        return rentals.stream().map(this::toRentalDTO).collect(Collectors.toList());
     }
+
 }

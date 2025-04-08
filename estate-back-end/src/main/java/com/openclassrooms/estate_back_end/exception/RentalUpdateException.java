@@ -5,4 +5,5 @@ public class RentalUpdateException extends RuntimeException {
     public RentalUpdateException(String message, Throwable cause) {
         super(message, cause);
     }
+
 }

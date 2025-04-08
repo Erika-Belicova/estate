@@ -8,9 +8,13 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 public class RentalDTO {
+
     private Integer id;
+
     private String name;
+
     private BigDecimal surface;
+
     private BigDecimal price;
 
     @JsonProperty("picture")

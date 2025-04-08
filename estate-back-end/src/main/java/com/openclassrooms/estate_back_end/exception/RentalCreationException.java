@@ -5,4 +5,5 @@ public class RentalCreationException extends RuntimeException {
     public RentalCreationException(String message, Throwable cause) {
         super(message, cause);
     }
+
 }

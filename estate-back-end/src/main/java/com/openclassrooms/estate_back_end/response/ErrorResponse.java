@@ -1,6 +1,7 @@
 package com.openclassrooms.estate_back_end.response;
 
 public class ErrorResponse {
+
     private final String error;
 
     public ErrorResponse(String error) {
@@ -10,4 +11,5 @@ public class ErrorResponse {
     public String getError() {
         return error;
     }
+
 }

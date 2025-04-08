@@ -8,7 +8,9 @@ import org.springframework.stereotype.Component;
 public class PictureStorageProperties {
 
     private String uploadDir;
+
     private String serverUrl;
+
     private String pictureUrlPath;
 
     public String getUploadDir() {

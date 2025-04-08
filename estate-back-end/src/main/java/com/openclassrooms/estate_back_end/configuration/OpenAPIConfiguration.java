@@ -11,12 +11,7 @@ import org.springframework.context.annotation.Configuration;
 
 import java.util.List;
 
-@SecurityScheme(
-        name = "Authorization",
-        type = SecuritySchemeType.HTTP,
-        bearerFormat = "JWT",
-        scheme = "bearer"
-)
+@SecurityScheme(name = "Authorization", type = SecuritySchemeType.HTTP, bearerFormat = "JWT", scheme = "bearer")
 @Configuration
 public class OpenAPIConfiguration {
 
@@ -29,11 +24,11 @@ public class OpenAPIConfiguration {
         Contact myContact = new Contact();
         myContact.setName("Erika Belicova");
 
-        Info information = new Info()
-                .title("Estate Application API")
-                .version("1.0")
-                .description("This API exposes endpoints to manage rentals.")
-                .contact(myContact);
+        Info information = new Info().title("Estate Application API")
+            .version("1.0")
+            .description("This API exposes endpoints to manage rentals.")
+            .contact(myContact);
         return new OpenAPI().info(information).servers(List.of(server));
     }
+
 }

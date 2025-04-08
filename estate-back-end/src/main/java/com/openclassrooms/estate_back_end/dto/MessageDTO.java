@@ -39,4 +39,5 @@ public class MessageDTO {
     public void setRentalId(Integer rentalId) {
         this.rentalId = rentalId;
     }
+
 }

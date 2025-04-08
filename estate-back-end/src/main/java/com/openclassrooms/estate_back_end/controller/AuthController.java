@@ -1,30 +1,34 @@
 package com.openclassrooms.estate_back_end.controller;
 
+import com.openclassrooms.estate_back_end.dto.LoginRequest;
+import com.openclassrooms.estate_back_end.dto.RegisterRequest;
+import com.openclassrooms.estate_back_end.model.User;
+import com.openclassrooms.estate_back_end.response.AuthResponse;
+import com.openclassrooms.estate_back_end.service.JWTService;
+import com.openclassrooms.estate_back_end.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.web.bind.annotation.*;
-import io.swagger.v3.oas.annotations.tags.Tag;
-
-import com.openclassrooms.estate_back_end.dto.LoginRequest;
-import com.openclassrooms.estate_back_end.dto.RegisterRequest;
-import com.openclassrooms.estate_back_end.model.User;
-import com.openclassrooms.estate_back_end.service.JWTService;
-import com.openclassrooms.estate_back_end.service.UserService;
-import com.openclassrooms.estate_back_end.response.AuthResponse;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/api/auth")
 public class AuthController {
 
     private final UserService userService;
+
     private final AuthenticationManager authenticationManager;
+
     private final JWTService jwtService;
 
     public AuthController(UserService userService, AuthenticationManager authenticationManager, JWTService jwtService) {
@@ -34,38 +38,40 @@ public class AuthController {
     }
 
     @Tag(name = "User APIs", description = "User authentication and registration APIs")
-    @Operation(summary = "Register a new user", description = "Create a new user by providing name, email and password. After successful registration, the user is authenticated and a JWT token is generated.")
+    @Operation(summary = "Register a new user",
+            description = "Create a new user by providing name, email and password. "
+                    + "After successful registration, the user is authenticated and a JWT token is generated.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "User successfully registered and JWT token generated"),
-            @ApiResponse(responseCode = "400", description = "Bad Request, invalid input")
-    })
+            @ApiResponse(responseCode = "400", description = "Bad Request, invalid input") })
     @PostMapping("/register")
     public ResponseEntity<AuthResponse> register(
             @Parameter(description = "User registration data including name, email, and password", required = true,
-                    example = "{\"Name\": \"Jean Dupont\", \"Email\": \"email@email.com\", \"Password\": \"password\"}")
-            @RequestBody @Valid RegisterRequest request) {
+                    example = "{\"Name\": \"Jean Dupont\", \"Email\": \"email@email.com\","
+                            + " \"Password\": \"password\"}") @RequestBody @Valid RegisterRequest request) {
+
         User user = userService.registerUser(request.getEmail(), request.getName(), request.getPassword());
-        Authentication authentication = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword())
-        );
+        Authentication authentication = authenticationManager
+            .authenticate(new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword()));
         String token = jwtService.generateToken(authentication);
         return ResponseEntity.ok(new AuthResponse(token)); // 200 ok
     }
 
     @Tag(name = "User APIs", description = "User authentication and registration APIs")
-    @Operation(summary = "Login an existing user", description = "Authenticate the user by email and password. If successful, the user is authenticated and a JWT token is generated.")
+    @Operation(summary = "Login an existing user",
+            description = "Authenticate the user by email and password. "
+                    + "If successful, the user is authenticated and a JWT token is generated.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Successfully logged in and JWT token generated"),
-            @ApiResponse(responseCode = "401", description = "Unauthorized, invalid credentials")
-    })
+            @ApiResponse(responseCode = "401", description = "Unauthorized, invalid credentials") })
     @PostMapping("/login")
-    public ResponseEntity<Object> login(
-            @Parameter(description = "Login credentials including email and password", required = true,
-                    example = "{\"Email\": \"email@email.com\", \"Password\": \"password\"}")
-            @RequestBody @Valid LoginRequest loginRequest) {
-        Authentication authentication = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(loginRequest.getEmail(), loginRequest.getPassword())
-        );
+    public ResponseEntity<Object> login(@Parameter(description = "Login credentials including email and password",
+            required = true,
+            example = "{\"Email\": \"email@email.com\"," +
+                " \"Password\": \"password\"}") @RequestBody @Valid LoginRequest loginRequest) {
+
+        Authentication authentication = authenticationManager
+            .authenticate(new UsernamePasswordAuthenticationToken(loginRequest.getEmail(), loginRequest.getPassword()));
         String token = jwtService.generateToken(authentication);
         return ResponseEntity.ok(new AuthResponse(token)); // 200 ok
     }
