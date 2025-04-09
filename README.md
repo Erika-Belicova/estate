@@ -78,9 +78,16 @@ Before running the back-end, ensure that MySQL is running on your machine.
 Open the MySQL application on your computer (for example, MySQL Workbench or the MySQL Command Line Client). Upon opening it, you'll be prompted to enter the root password you set during installation. In MySQL Command Line Client, you’ll then see the MySQL prompt (e.g., mysql>); in MySQL Workbench, a graphical interface will open where you can browse databases and run SQL queries.
   
 ### Create the Database  
-In MySQL, create a new database for your application. You can run the following command to create the database:  
+In MySQL, create a new database for your application. You can run the following commands to create and use the database:  
   
-`CREATE DATABASE estate_application_db;` 
+```
+CREATE DATABASE estate_application_db;
+USE estate_application_db;
+```
+
+-   The `CREATE DATABASE` command creates a new database called `estate_application_db`.
+-   The `USE` command tells MySQL to switch to the newly created database, so any future operations (like creating tables or inserting data) will be done in this database.
+
 
 ### Run the SQL Script to Initialize the Database
 Once the database is set up, you need to run the SQL script to initialize the required tables. The SQL script is located at:
@@ -144,12 +151,12 @@ _____
 _____
 
 ### Empty the Database for Testing
-If you want to empty the database during testing (for example, when you want to reset the data), you can delete all records from the tables by running the following SQL commands:
+If you want to empty the database during testing (for example, when you want to reset the data), you can delete all records from the tables by running the following SQL commands in this order:
 
 ```
-DELETE FROM USERS;
-DELETE FROM RENTALS;
 DELETE FROM MESSAGES;
+DELETE FROM RENTALS;
+DELETE FROM USERS;
 ```
 
 This will remove all data from the tables while keeping the table structure intact, which is useful for resetting data during tests. The related records in other tables will also be deleted automatically.
@@ -160,6 +167,7 @@ If you want to completely reinitialize the database (drop all tables and recreat
 ```
 DROP DATABASE IF EXISTS estate_application_db;
 CREATE DATABASE estate_application_db;
+USE estate_application_db;
 ```
 
 Then re-run the SQL script to reinitialize the tables.
