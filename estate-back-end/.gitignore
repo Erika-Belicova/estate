@@ -34,3 +34,7 @@ build/
 
 ### Environment Variables ###
 .env
+
+### Pictures uploaded during rental creation ###
+/pictures/*
+!/pictures/.gitkeep
