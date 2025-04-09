@@ -93,9 +93,9 @@ Open your MySQL application (such as MySQL Workbench or the MySQL Command Line C
 
 -   In the **MySQL Command Line Client**, use the `source` command to run the script:
 
-  `source path\to\script.sql`;
+     `source path\to\script.sql`;
 
-  Replace path\to\script.sql with the full path to the file on your system.
+      Replace `path\to\script.sql` with the full path to the file on your system.
 
 This will create the necessary tables for the back-end to function correctly.  
   
@@ -123,13 +123,13 @@ In your **estate-back-end/src/main/resources/application.properties**, make sure
 The configuration should look like this:  
   
 ```
-spring.datasource.url=jdbc:mysql://localhost:3306/estate?serverTimeZone=UTC
+spring.datasource.url=jdbc:mysql://localhost:3306/estate_application_db?serverTimeZone=UTC
 spring.datasource.username=${DATABASE_USERNAME}
 spring.datasource.password=${DATABASE_PASSWORD}
 spring.datasource.driver-class-name=com.mysql.cj.jdbc.Driver
 ```
 
--   Make sure the name estate matches the database you created earlier.
+-   Make sure the name `estate_application_db` matches the database you created earlier.
 -   The **\${DATABASE_USERNAME}** and **\${DATABASE_PASSWORD}** values will be loaded from the **.env** file.  
 
 _____
